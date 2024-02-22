@@ -154,55 +154,49 @@ document.getElementById("show-registration-form").addEventListener("click", func
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>控制小球</title>
-<style>
-    canvas {
-        border: 1px solid black;
-    }
-</style>
-</head>
-<body>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>虚拟摇杆控制小球</title>
 <style>
+    body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+    }
     canvas {
-        border: 1px solid black;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #f0f0f0;
     }
     .joystick {
-        position: absolute;
+position: absolute;
         bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 100px;
-        height: 100px;
+        left: 20px;
+        width: 80px;
+        height: 80px;
         background-color: rgba(0, 0, 0, 0.5);
         border-radius: 50%;
     }
     .stick {
-position: absolute;
+        position: absolute;
         top: 50%;
         left: 50%;
-        transform: translate(-50%, -50%);
-        width: 50px;
-        height: 50px;
+        width: 40px;
+        height: 40px;
         background-color: rgba(255, 255, 255, 0.8);
         border-radius: 50%;
     }
 </style>
 </head>
 <body>
-
-<canvas id="gameCanvas" width="400" height="400"></canvas>
+<canvas id="gameCanvas"></canvas>
 <div class="joystick" id="joystick">
     <div class="stick" id="stick"></div>
 </div>
 
 <script>
-const canvas = document.getElementById('gameCanvas');
+    const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     const joystick = document.getElementById('joystick');
     const stick = document.getElementById('stick');
@@ -211,15 +205,15 @@ const canvas = document.getElementById('gameCanvas');
     let y = canvas.height - 30;
     let dx = 2;
     let dy = -2;
-    const ballRadius = 10;
+    const ballRadius = 5;
 
     let touchStartX = 0;
     let touchStartY = 0;
-
-    stick.addEventListener('touchstart', handleTouchStart);
+stick.addEventListener('touchstart', handleTouchStart);
     stick.addEventListener('touchmove', handleTouchMove);
     stick.addEventListener('touchend', handleTouchEnd);
-function handleTouchStart(event) {
+
+    function handleTouchStart(event) {
         touchStartX = event.touches[0].clientX;
         touchStartY = event.touches[0].clientY;
     }
@@ -237,11 +231,15 @@ function handleTouchStart(event) {
         let angle = Math.atan2(deltaY, deltaX);
 
         if (distance > 25) {
-            deltaX = Math.cos(angle) * 25;
+deltaX = Math.cos(angle) * 25;
             deltaY = Math.sin(angle) * 25;
         }
-stick.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+
+        stick.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
         moveBall(deltaX, deltaY);
+
+        touchStartX = touchX;
+        touchStartY = touchY;
     }
 
     function handleTouchEnd(event) {
@@ -255,13 +253,13 @@ stick.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
 
         if (x < ballRadius) {
             x = ballRadius;
-        } else if (x > canvas.width - ballRadius) {
+} else if (x > canvas.width - ballRadius) {
             x = canvas.width - ballRadius;
         }
 
         if (y < ballRadius) {
             y = ballRadius;
-} else if (y > canvas.height - ballRadius) {
+        } else if (y > canvas.height - ballRadius) {
             y = canvas.height - ballRadius;
         }
     }
@@ -277,10 +275,11 @@ stick.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
 
     function draw() {
         drawBall();
-        requestAnimationFrame(draw);
+requestAnimationFrame(draw);
     }
 
     draw();
 </script>
+
 </body>
 </html>
