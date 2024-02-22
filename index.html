@@ -162,13 +162,50 @@ document.getElementById("show-registration-form").addEventListener("click", func
 </style>
 </head>
 <body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>虚拟摇杆控制小球</title>
+<style>
+    canvas {
+        border: 1px solid black;
+    }
+    .joystick {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 100px;
+        background-color: rgba(0, 0, 0, 0.5);
+        border-radius: 50%;
+    }
+    .stick {
+position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 50px;
+        height: 50px;
+        background-color: rgba(255, 255, 255, 0.8);
+        border-radius: 50%;
+    }
+</style>
+</head>
+<body>
 
 <canvas id="gameCanvas" width="400" height="400"></canvas>
+<div class="joystick" id="joystick">
+    <div class="stick" id="stick"></div>
+</div>
 
 <script>
-    // JavaScript 游戏代码示例
 const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
+    const joystick = document.getElementById('joystick');
+    const stick = document.getElementById('stick');
 
     let x = canvas.width / 2;
     let y = canvas.height - 30;
@@ -176,29 +213,61 @@ const canvas = document.getElementById('gameCanvas');
     let dy = -2;
     const ballRadius = 10;
 
-    let rightPressed = false;
-    let leftPressed = false;
+    let touchStartX = 0;
+    let touchStartY = 0;
 
-    document.addEventListener("keydown", keyDownHandler, false);
-    document.addEventListener("keyup", keyUpHandler, false);
+    stick.addEventListener('touchstart', handleTouchStart);
+    stick.addEventListener('touchmove', handleTouchMove);
+    stick.addEventListener('touchend', handleTouchEnd);
+function handleTouchStart(event) {
+        touchStartX = event.touches[0].clientX;
+        touchStartY = event.touches[0].clientY;
+    }
 
-    function keyDownHandler(e) {
-        if (e.key === "Right" || e.key === "ArrowRight") {
-            rightPressed = true;
-        } else if (e.key === "Left" || e.key === "ArrowLeft") {
-            leftPressed = true;
+    function handleTouchMove(event) {
+        event.preventDefault();
+
+        let touchX = event.touches[0].clientX;
+        let touchY = event.touches[0].clientY;
+
+        let deltaX = touchX - touchStartX;
+        let deltaY = touchY - touchStartY;
+
+        let distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        let angle = Math.atan2(deltaY, deltaX);
+
+        if (distance > 25) {
+            deltaX = Math.cos(angle) * 25;
+            deltaY = Math.sin(angle) * 25;
         }
-}
+stick.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+        moveBall(deltaX, deltaY);
+    }
 
-    function keyUpHandler(e) {
-        if (e.key === "Right" || e.key === "ArrowRight") {
-            rightPressed = false;
-        } else if (e.key === "Left" || e.key === "ArrowLeft") {
-            leftPressed = false;
+    function handleTouchEnd(event) {
+        stick.style.transform = 'translate(0, 0)';
+        moveBall(0, 0);
+    }
+
+    function moveBall(deltaX, deltaY) {
+        x += deltaX / 5;
+        y += deltaY / 5;
+
+        if (x < ballRadius) {
+            x = ballRadius;
+        } else if (x > canvas.width - ballRadius) {
+            x = canvas.width - ballRadius;
+        }
+
+        if (y < ballRadius) {
+            y = ballRadius;
+} else if (y > canvas.height - ballRadius) {
+            y = canvas.height - ballRadius;
         }
     }
 
     function drawBall() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.beginPath();
         ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
         ctx.fillStyle = "#0095DD";
@@ -207,29 +276,11 @@ const canvas = document.getElementById('gameCanvas');
     }
 
     function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawBall();
-if (rightPressed && x < canvas.width - ballRadius) {
-            x += 7;
-        } else if (leftPressed && x > ballRadius) {
-            x -= 7;
-        }
-
-        x += dx;
-        y += dy;
-
-        if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
-            dx = -dx;
-        }
-
-        if (y + dy < ballRadius) {
-            dy = -dy;
-        } else if (y + dy > canvas.height - ballRadius) {
-            dy = -dy;
-        }
+        requestAnimationFrame(draw);
     }
-setInterval(draw, 10);
-</script>
 
+    draw();
+</script>
 </body>
 </html>
