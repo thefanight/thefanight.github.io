@@ -19,3 +19,35 @@
 </body>
 </html>
 <h1>五五开你直接给我坐下😡!</h1>
+def register():
+    username = input("请输入用户名: ")
+    password = input("请输入密码: ")
+
+    # 检查用户名是否已存在
+    with open("user_accounts.txt", "r") as file:
+        for line in file:
+            existing_username, _ = line.strip().split(":")
+            if existing_username == username:
+                print("用户名已存在，请选择其他用户名！")
+                return
+# 将新用户信息写入文件
+    with open("user_accounts.txt", "a") as file:
+        file.write(f"{username}:{password}\n")
+    
+    print("注册成功！")
+
+
+def main():
+    while True:
+        choice = input("欢迎注册！输入'R'注册新账号，输入'Q'退出: ").strip().upper()
+        if choice == "R":
+            register()
+elif choice == "Q":
+            print("再见！")
+            break
+        else:
+            print("无效选项，请重新输入。")
+
+
+if __name__ == "__main__":
+    main()
